@@ -8,6 +8,8 @@ import de.seuhd.campuscoffee.domain.exceptions.PosNotFoundException;
 import de.seuhd.campuscoffee.domain.model.CampusType;
 import de.seuhd.campuscoffee.domain.model.Pos;
 import org.jspecify.annotations.NonNull;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -44,7 +46,7 @@ public interface PosService {
     @NonNull Pos getById(@NonNull Long id) throws PosNotFoundException;
 
     // TODO: Add a new getByName method to enable fetching POS by name.
-
+    @NonNull Pos getByName(String name);
     /**
      * Creates a new POS or updates an existing one.
      * This method performs an "upsert" operation:
