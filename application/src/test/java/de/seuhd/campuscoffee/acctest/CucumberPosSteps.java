@@ -1,5 +1,6 @@
 package de.seuhd.campuscoffee.acctest;
 
+import de.seuhd.campuscoffee.TestUtils;
 import de.seuhd.campuscoffee.api.dtos.PosDto;
 import de.seuhd.campuscoffee.domain.model.CampusType;
 import de.seuhd.campuscoffee.domain.model.PosType;
@@ -28,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @CucumberContextConfiguration
-public class CucumberPosSteps {
+public class  CucumberPosSteps {
     static final PostgreSQLContainer<?> postgresContainer;
 
     static {
@@ -90,8 +91,7 @@ public class CucumberPosSteps {
         List<PosDto> retrievedPosList = retrievePos();
         assertThat(retrievedPosList).isEmpty();
     }
-
-    // TODO: Add Given step for new scenario
+    //reuse @Given von dem vorherigen Cucumber Feature
 
     // When -----------------------------------------------------------------------
 
@@ -102,6 +102,25 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add When step for new scenario
+    @When("I update the description of the POS with name {string} to {string}")
+    public void update_pos(String posName, String newDescription){
+        PosDto originalPos = TestUtils.retrievePosByName(posName);
+        PosDto modifiedPos = new PosDto(
+                originalPos.id(),          // id
+                originalPos.createdAt(),   // createdAt
+                originalPos.updatedAt(),   // updatedAt
+                originalPos.name(),        // name
+                newDescription,            // description (ÄNDERUNG!)
+                originalPos.type(),        // type
+                originalPos.campus(),      // campus
+                originalPos.street(),      // street
+                originalPos.houseNumber(), // houseNumber
+                originalPos.postalCode(),  // postalCode (Integer)
+                originalPos.city()         // city
+        );
+        TestUtils.updatePos(List.of(modifiedPos));
+    }
+
 
     // Then -----------------------------------------------------------------------
 
@@ -114,4 +133,12 @@ public class CucumberPosSteps {
     }
 
     // TODO: Add Then step for new scenario
+    @Then("check whether POS named {string} has the description {string}")
+    public void isdescriptionupdated(String name, String expectedDescription){
+        PosDto pos = TestUtils.retrievePosByName(name);
+        assertThat(pos.description())
+                .as("Description of POS '%s' should be '%s'", name, expectedDescription)
+                .isEqualTo(expectedDescription);
+    }
+
 }
